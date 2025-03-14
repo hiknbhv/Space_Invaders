@@ -308,7 +308,6 @@ class AlienBullet(pygame.sprite.Sprite):
 
 
 
-
 #Create bullet groups
 my_player_bullet_group = pygame.sprite.Group()
 my_alien_bullet_group = pygame.sprite.Group()
