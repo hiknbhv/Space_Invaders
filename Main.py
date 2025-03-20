@@ -55,6 +55,8 @@ class Game:
         # Set colors
         # TODO: 3/13/2025: add all of this code to draw.  Tis a freebie.
         WHITE = (255, 255, 255)
+        BLACK = (0, 0, 0)
+
 
         # Set text
         score_text = self.font.render("Score: " + str(self.score), True, WHITE)
@@ -79,17 +81,52 @@ class Game:
 
     def shift_aliens(self):
         """Shift a wave of aliens down the screen and reverse direction"""
-        ... #TODO: we will do this one later.
+        # Determine if alien group has hit an edge
+        shift = False
+        for alien in (self.alien_group.sprites()):
+            if alien.rect.left <= 0 or alien.rect.right <= WINDOW_WIDTH:
+                shift = True
+            # TODO: 3/18/2025: check if alien.rect.left is less than or equal to 0 or alien.rect.right is greater than or equal to WINDOW_WIDTH
+                # TODO: 3/18/2025: set shift to True
+        if shift:
+            # start of if
+            breach = False
+            # TODO 3/18/2025:  create a variable named breach and assign False to it.
+            for alien in (self.alien_group.sprites()):
+                alien.rect.y =+ 10 * self.round_number
+                alien.direction = -1 * alien.direction
+                alien.rect.x =+ alien.direction * alien.velocity
+                # TODO 3/18/2025:  add 10 * self.round_number to alien.rect.y
+                # TODO 3/18/2025:  set alien.direction to -1 * alien.direction
+                # TODO 3/18/2025:  add alien.direction * alien.velocity to alien.rect.x
+
+                # Check if an alien reached the ship
+                if alien.rect.bottom >= WINDOW_HEIGHT - 100:
+                    breach = True
+
+
+            # Aliens breached the line
+            if breach:
+                self.breach_sound.play()
+                self.player.lives =- 1
+                self.check_game_status("Aliens breached the line!", "Press 'Enter' to continue")
+            # Start of if
+                # TODO:  3/18/2025:  play self.breach_sound's
+                # TODO:  3/18/2025: subtract 1 from self.player.lives
+                # TODO:  3/18/2025: call self.check_game_status().  Passing in "Aliens breached the line!", "Press 'Enter' to continue"
+            # end if statement
+            # end of if statement.
 
     def check_collision(self):
         """Check for collisions"""
         if pygame.sprite.groupcollide(self.player_bullet_group, self.alien_group) == True:
             self.alien_hit_sound.play()
+            self.score =+ 100
             # TODO: 3/13/2025 check if pygame.spite.groupcollide is true passing in self.player_bullet_group, self.alien_group, True, and True into the method
             # TODO: 3/13/2025 call self.alien_hit_sound's play method
             # TODO: 3/13/2025 add 100 to self.score
 
-            self.score =+ 100
+
         if pygame.sprite.groupcollide(self.player_bullet_group, self.alien_group) == True:
             self.player_hit_sound.play()
             self.player.lives =- 1
@@ -113,7 +150,15 @@ class Game:
 
     def start_new_round(self):
         """Start a new round"""
-        ... #TODO: we will do this one later.
+        # Create a grid of Aliens 11 columns and 5 rows
+        for i in range(11):
+            for j in range(5):
+                x = 64 + i * 64  # start_offset + column * column_spacing
+                y = 64 + j * 64  # start_offset + row * row_spacing
+                velocity = self.round_number
+                group = self.alien_bullet_group
+                alien = Alien(x, y, velocity, group)
+
 
     def check_game_status(self, main_text, sub_text):
         """Check to see the status of the game and how the player died"""
@@ -137,8 +182,62 @@ class Game:
 
     def pause_game(self, main_text, sub_text):
         """Pauses the game"""
-        ... #TODO: we will do this one later.
+        global running
+        WHITE = (255, 255, 255)
+        BLACK = (0, 0, 0)
+        main_text = self.font.render(main_text, True, WHITE)
+        main_rect = main_text.get_rect()
+        main_rect.center = (WINDOW_WIDTH, WINDOW_HEIGHT//2)
+        # TODO: 3/18/2025: need WHITE and BLACK colors.  Use tuples, 3 255's for white, and 3 0's for black
 
+        # TODO: 3/18/2025: assign to main_text the following:  self.font.render(), passing in main_text, True, and WHITE
+        # TODO: 3/18/2025: create a main_rect from main_text using the get_rect() function
+        # TODO: 3/18/2025: set main_rect's center to the center of the screen,
+        #  using WINDOW_WIDTH, and WIDTH_HEIGHT in a tuple.
+        #  Hint hint // division
+        sub_text = self.font.render(sub_text, True, WHITE)
+        sub_rect = sub_text.get_rect()
+        sub_rect = (WINDOW_WIDTH, WINDOW_HEIGHT // 2 + 64)
+
+        # Create sub pause text
+        # TODO: 3/18/2025: assign to sub_text the following:  self.font.render(), passing in sub_text, True, and WHITE
+        # TODO: 3/18/2025: create a sub_rect from sub_text using the get_rect() function
+        # TODO: 3/18/2025: set sub_rect's center to the center of the screen but 64 pixels down,
+        #  using WINDOW_WIDTH, and WIDTH_HEIGHT in a tuple.
+        #  Hint hint // division.  but for the y componeent of the tuple add 64
+
+        # Blit the pause text
+        display_surface.fill(BLACK)
+        display_surface.blit(main_text, main_rect)
+        display_surface.blit(sub_text, sub_rect)
+        pygame.display.update()
+
+        # Pause the game until the user hits enter
+        is_paused = True
+        while is_paused:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        is_paused = False
+
+            if event.type == pygame.QUIT:
+                is_paused = False
+                running = False
+
+        # The user wants to play again
+        # TODO: 3/18/2025: check if event.type is equal to pygame.KEYDOWN
+        # start of if
+        # TODO: 3/18/2025: check if the event.key is equal to pygame.K_RETURN
+        # start of if
+        # TODO: 3/18/2025: set is_paused to False
+        # end of if
+        # end of if
+
+        # The user wants to quit
+        # TODO: 3/18/2025: check if the event.type is equal to pygame.QUIT
+        # start of if
+        # TODO: 3/18/2025: set is_paused to False
+        # TODO: 3/18/2025: set running to False
     def reset_game(self):
         """Reset the game"""
         self.pause_game("Final Score: " + str(self.score) and "Press 'Enter' to play again")
